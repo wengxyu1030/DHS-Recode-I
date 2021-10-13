@@ -18,10 +18,12 @@ macro drop _all
 
 //NOTE FOR WINDOWS USERS : use "/" instead of "\" in your paths
 
-global root "/Users/xianzhang/Dropbox/DHS"
+* Define root depend on the stata user. 
+if "`c(username)'" == "xweng"     local pc = 1
+if `pc' == 1 global root "C:/Users/XWeng/OneDrive - WBG/MEASURE UHC DATA"
 
 * Define path for data sources
-global SOURCE "/Volumes/alan/DHS/RAW DATA/Recode I"
+global SOURCE "${root}/RAW DATA/Recode I"
 
 * Define path for output data
 global OUT "${root}/STATA/DATA/SC/FINAL"
@@ -30,18 +32,20 @@ global OUT "${root}/STATA/DATA/SC/FINAL"
 global INTER "${root}/STATA/DATA/SC/INTER"
 
 * Define path for do-files
-global DO "${root}/STATA/DO/SC/DHS/Recode-I"
-
-* Define the country names (in globals) in by Recode
-do "${DO}/0_GLOBAL.do"
+if `pc' != 0 global DO "${root}/STATA/DO/SC/DHS/DHS-Recode-I"
 
 /*
 This do files is use to process:
-Bolivia1989  Burundi1987  Colombia1986  DominicanRepublic1986 Ecuador1987  Egypt1988 ElSalvador1985 Ghana1988 Guatemala1987  Indonesia1987  
-Liberia1986 Mali1987 Mexico1987  Morocco1987   Sudan1989 Thailand1987  Togo1988  TrinidadandTobago1987 Uganda1988 Zimbabwe1988   
+Bolivia1989  Burundi1987  Colombia1986  DominicanRepublic1986 Ecuador1987 Egypt1988 Ghana1988 Guatemala1987  Indonesia1987 Liberia1986 Mali1987 Mexico1987  Morocco1987 Thailand1987  Togo1988  TrinidadandTobago1987 Uganda1988 Zimbabwe1988 ElSalvador1985 Sudan1989
 A hm2.dta will be generated from hh.dta for these surveys.
 */
-foreach name in { 
+
+/* issue: 
+ElSalvador1985 data don't fit the template
+Sudan1989 s424e not found
+*/
+
+foreach name in Bolivia1989  Burundi1987  Colombia1986  DominicanRepublic1986 Ecuador1987 Egypt1988 Ghana1988 Guatemala1987  Indonesia1987 Liberia1986 Mali1987 Mexico1987  Morocco1987 Thailand1987  Togo1988  TrinidadandTobago1987 Uganda1988 Zimbabwe1988 ElSalvador1985 Sudan1989  { 
 
 tempfile birth ind men hm hiv hh wi zsc iso  hmhh
 
@@ -184,8 +188,13 @@ save `birth'
 *****domains using ind data***
 ******************************
 use "${SOURCE}/DHS-`name'/DHS-`name'ind.dta", clear	
-duplicates drop caseid,force // 1 duplicates in SriLanka1987, 5 in DominicanRepublic1991
 gen name = "`name'"
+
+if inlist(name,"SriLanka1987","DominicanRepublic1991") {
+duplicates drop caseid, force // 1 duplicates in SriLanka1987, 5 in DominicanRepublic1991
+}
+
+
 gen hm_age_yrs = v012
     do "${DO}/4_sexual_health"
     do "${DO}/5_woman_anthropometrics"

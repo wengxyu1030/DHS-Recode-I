@@ -1,6 +1,6 @@
 
 ******************************
-*** Child mortality***********
+*** Child other***********
 ******************************   
 
 *c_ITN	Child slept under insecticide-treated-bednet (ITN) last night.
