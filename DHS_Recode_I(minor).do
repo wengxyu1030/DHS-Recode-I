@@ -18,10 +18,12 @@ macro drop _all
 
 //NOTE FOR WINDOWS USERS : use "/" instead of "\" in your paths
 
-global root "/Users/xianzhang/Dropbox/DHS"
+* Define root depend on the stata user. 
+if "`c(username)'" == "xweng"     local pc = 1
+if `pc' == 1 global root "C:/Users/XWeng/OneDrive - WBG/MEASURE UHC DATA"
 
 * Define path for data sources
-global SOURCE "/Volumes/alan/DHS/RAW DATA/Recode I"
+global SOURCE "${root}/RAW DATA/Recode I"
 
 * Define path for output data
 global OUT "${root}/STATA/DATA/SC/FINAL"
@@ -30,19 +32,17 @@ global OUT "${root}/STATA/DATA/SC/FINAL"
 global INTER "${root}/STATA/DATA/SC/INTER"
 
 * Define path for do-files
-global DO "${root}/STATA/DO/SC/DHS/Recode-I"
-
-* Define the country names (in globals) in by Recode
-do "${DO}/0_GLOBAL.do"
+if `pc' != 0 global DO "${root}/STATA/DO/SC/DHS/DHS-Recode-I"
 
 /*
 The code is used to process Brazil1986  SriLanka1987 Tunisia1988 Kenya1989 Peru1986 Senegal1986
+
 We cannot generate hm.dta from hh.dta for these survey points 
 either because the hh.dta doesn't offer household members' line number 
 or we cannot generate v001 v002 from hh.dta to match with birth.dta or ind.dta
 The final dataset only contains children and women sample
 */
-foreach name in  Brazil1986  SriLanka1987 Tunisia1988 Kenya1989 Peru1986 Senegal1986{ //{
+foreach name in  Brazil1986  SriLanka1987 Tunisia1988 Kenya1989 Peru1986 Senegal1986 { //{
 
 tempfile birth ind men hm hiv hh wi zsc iso  hmhh
 
@@ -279,6 +279,7 @@ cap gen hm_shstruct2 = 999
 keep hhid hv001 hm_shstruct* hv002  hh_* //hv003
 save `hh',replace
 */
+
 ************************************
 *****merge to microdata*************
 ************************************
@@ -316,7 +317,7 @@ if miss_b16 != 1 {
 	//label define hm_headrel_lab 99 "dead/no longer in the household"
 	//label values hm_headrel hm_headrel_lab
 	//replace hm_live = 0 if _merge == 2 | inlist(hm_headrel,.,12,98)
-	drop _merge
+	//drop _merge
 	
 	*merge m:m hv001 hm_shstruct1 hm_shstruct2 hv002       using `hh',nogen update 
  
