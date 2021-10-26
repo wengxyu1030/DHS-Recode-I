@@ -34,6 +34,9 @@ global INTER "${root}/STATA/DATA/SC/INTER"
 * Define path for do-files
 if `pc' != 0 global DO "${root}/STATA/DO/SC/DHS/DHS-Recode-I"
 
+* Define the country names (in globals) in by Recode
+do "${DO}/0_GLOBAL.do"
+
 /*
 The code is used to process Brazil1986  SriLanka1987 Tunisia1988 Kenya1989 Peru1986 Senegal1986
 
