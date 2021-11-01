@@ -20,19 +20,25 @@ macro drop _all
 
 * Define root depend on the stata user. 
 if "`c(username)'" == "xweng"     local pc = 1
+	if "`c(username)'" == "robinwang"     local pc = 4
+
 if `pc' == 1 global root "C:/Users/XWeng/OneDrive - WBG/MEASURE UHC DATA"
+	if `pc' == 4 global root "/Users/robinwang/Documents/MEASURE UHC DATA"
 
 * Define path for data sources
 global SOURCE "${root}/RAW DATA/Recode I"
 
 * Define path for output data
 global OUT "${root}/STATA/DATA/SC/FINAL"
+	if `pc' == 4 global OUT "${root}/STATA/DATA/SC/FINAL"
 
 * Define path for INTERMEDIATE
 global INTER "${root}/STATA/DATA/SC/INTER"
+	if `pc' == 4 global INTER "${root}/STATA/DATA/SC/INTER"
 
 * Define path for do-files
 if `pc' != 0 global DO "${root}/STATA/DO/SC/DHS/DHS-Recode-I"
+	if `pc' == 4 global DO "/Users/robinwang/Documents/MEASURE UHC DATA/DHS-Recode-I"
 
 * Define the country names (in globals) in by Recode
 do "${DO}/0_GLOBAL.do"
@@ -45,10 +51,19 @@ A hm2.dta will be generated from hh.dta for these surveys.
 
 /* issue: 
 ElSalvador1985 data don't fit the template
+- DHS data for ElSalvador1985 only has ind and birth
+
 Sudan1989 s424e not found
+- s424e corrected to s440 in template for 8_child_illness for Sudan1989
+- New error: variables hv001 hm_shstruct1 hm_shstruct2 hv002 hvidx do not uniquely identify
+    observations in the master data
+
+*/
+/*
+foreach name in Bolivia1989  Burundi1987  Colombia1986  DominicanRepublic1986 Ecuador1987 Egypt1988 Ghana1988 Guatemala1987  Indonesia1987 Liberia1986 Mali1987 Mexico1987  Morocco1987 Thailand1987  Togo1988  TrinidadandTobago1987 Uganda1988 Zimbabwe1988 ElSalvador1985 Sudan1989  { 
 */
 
-foreach name in Bolivia1989  Burundi1987  Colombia1986  DominicanRepublic1986 Ecuador1987 Egypt1988 Ghana1988 Guatemala1987  Indonesia1987 Liberia1986 Mali1987 Mexico1987  Morocco1987 Thailand1987  Togo1988  TrinidadandTobago1987 Uganda1988 Zimbabwe1988 ElSalvador1985 Sudan1989  { 
+foreach name in Sudan1989 {
 
 tempfile birth ind men hm hiv hh wi zsc iso  hmhh
 

@@ -126,7 +126,7 @@ order *,sequential  //make sure variables are in order.
 		}		
 		if inlist(name,"Sudan1989"){
 			replace eat = 1 if inlist(s440,2,4,5) & c_diarrhea == 1
-			replace eat = 0 if inlist(s424e,1,3) & c_diarrhea == 1
+			replace eat = 0 if inlist(s440,1,3) & c_diarrhea == 1
 		}
 				
 /*       gen eat = (inlist(h39,0,1,2)) if !inlist(h39,.,8) & c_diarrhea == 1 */
