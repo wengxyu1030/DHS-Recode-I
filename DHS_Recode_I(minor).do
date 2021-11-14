@@ -20,22 +20,29 @@ macro drop _all
 
 * Define root depend on the stata user. 
 if "`c(username)'" == "xweng"     local pc = 1
+	if "`c(username)'" == "robinwang"     local pc = 4
+
 if `pc' == 1 global root "C:/Users/XWeng/OneDrive - WBG/MEASURE UHC DATA"
+	if `pc' == 4 global root "/Users/robinwang/Documents/MEASURE UHC DATA"
 
 * Define path for data sources
 global SOURCE "${root}/RAW DATA/Recode I"
 
 * Define path for output data
 global OUT "${root}/STATA/DATA/SC/FINAL"
+	if `pc' == 4 global OUT "${root}/STATA/DATA/SC/FINAL"
 
 * Define path for INTERMEDIATE
 global INTER "${root}/STATA/DATA/SC/INTER"
+	if `pc' == 4 global INTER "${root}/STATA/DATA/SC/INTER"
 
 * Define path for do-files
 if `pc' != 0 global DO "${root}/STATA/DO/SC/DHS/DHS-Recode-I"
+	if `pc' == 4 global DO "/Users/robinwang/Documents/MEASURE UHC DATA/DHS-Recode-I"
 
 * Define the country names (in globals) in by Recode
 do "${DO}/0_GLOBAL.do"
+global DHScountries_Recode_I "Peru1986"
 
 /*
 The code is used to process Brazil1986  SriLanka1987 Tunisia1988 Kenya1989 Peru1986 Senegal1986
@@ -45,9 +52,9 @@ either because the hh.dta doesn't offer household members' line number
 or we cannot generate v001 v002 from hh.dta to match with birth.dta or ind.dta
 The final dataset only contains children and women sample
 */
-foreach name in  Brazil1986  SriLanka1987 Tunisia1988 Kenya1989 Peru1986 Senegal1986 { //{
+foreach name in $DHScountries_Recode_I { //{
 
-tempfile birth ind men hm hiv hh wi zsc iso  hmhh
+tempfile birth ind men hm hiv hh wi zsc iso hmhh
 
 ************************************
 ***domains using zsc data***********
@@ -73,19 +80,43 @@ if _rc == 0 {
     	gen ant_sampleweight = v005/10e6  
     	drop if _!=3
 		
-  		foreach var in hc70 hc71 {
+		cap clonevar c_motherln = v003 /*DW Nov 2021 - use v003 from birth.dta in the zsc dependent code chunk*/
+				
+  		foreach var in hc70 hc71 hc72 {
   	 	replace `var'=. if `var'>900
   	 	replace `var'=`var'/100
   		}
   		replace hc70=. if hc70<-6 | hc70>6
   		replace hc71=. if hc71<-6 | hc71>5
- 		gen c_stunted=1 if hc70<-2
+   		replace hc72=. if hc72<-6 | hc72>5
+
+		gen c_stunted=1 if hc70<-2
  		replace c_stunted=0 if hc70>=-2 & hc70!=.
  		gen c_underweight=1 if hc71<-2
  		replace c_underweight=0 if hc71>=-2 & hc71!=.
-		
+ 		gen c_wasted=1 if hc72<-2
+ 		replace c_wasted=0 if hc72>=-2 & hc72!=.
+		gen c_stunted_sev=1 if hc70<-3
+		replace c_stunted_sev=0 if hc70>=-3 & hc70!=.
+		gen c_underweight_sev=1 if hc71<-3
+		replace c_underweight_sev=0 if hc71>=-3 & hc71!=.
+		gen c_wasted_sev=1 if hc72<-3
+		replace c_wasted_sev=0 if hc72>=-3 & hc72!=.		
+
+*c_stu_was: Both stunted and wasted
+		gen c_stu_was = (c_stunted == 1 & c_wasted ==1) 
+		replace c_stu_was = . if c_stunted == . | c_wasted == . 
+		label define l_stu_was 1 "Both stunted and wasted"
+		label values c_stu_was l_stu_was		
+
+*c_stu_was_sev: Both severely stunted and severely wasted		
+		gen c_stu_was_sev = (c_stunted_sev == 1 & c_wasted_sev == 1)
+		replace c_stu_was_sev = . if c_stunted_sev == . | c_wasted_sev == . 
+		label define l_stu_was_sev 1 "Both severely stunted and severely wasted"
+		label values c_stu_was_sev l_stu_was_sev
+			
 		rename ant_sampleweight c_ant_sampleweight 
-		keep c_* caseid bidx hwlevel hc70 hc71
+		keep c_* caseid bidx hwlevel hc70 hc71 hc72
 		save "${INTER}/zsc_birth.dta",replace
     }
 /*
@@ -135,9 +166,11 @@ use "${SOURCE}/DHS-`name'/DHS-`name'birth.dta", clear
 	capture confirm file "${INTER}/zsc_birth.dta"
 	if _rc == 0 {
 	merge 1:1 caseid bidx using "${INTER}/zsc_birth.dta",nogen
-	rename (hc70 hc71) (c_hc70 c_hc71)
+	rename (hc70 hc71 hc72) (c_hc70 c_hc71 c_hc72)
     }
-	
+
+	cap clonevar c_motherln = v003 /*DW Nov 2021 - use v003 from birth.dta in the code chunk*/
+
 *housekeeping for birthdata
    //generate the demographics for child who are dead or no longer living in the hh. 
    
@@ -177,7 +210,17 @@ if miss_b16 == 1 {
 rename (v000 v001 v002 v003) (hv000 hv001 hv002 hvidx) //v003 in birth.dta: mother's line number
 }
 
-keep hv000 hv001 hv002 hvidx bidx c_* mor_* w_* hm_* 
+/*DW NOV 2021*/
+*hh_religion: religion of household head (DW Team Nov 2021)
+	cap clonevar hh_religion = v130
+	
+*hh_watersource: Water source (hv201 in DHS HH dataset, already coded for MICS)
+	clonevar hh_watersource =  v113
+
+*hh_toilet: Toilet type (hv205 “”, already coded for MICS)
+	clonevar hh_toilet = v116 
+
+keep hv000 hv001 hv002 hvidx bidx c_* mor_* w_* hm_* hh_*
 save `birth'
 
 
@@ -331,7 +374,7 @@ if miss_b16 != 1 {
 	foreach k in  a_diab_treat a_inpatient_1y a_bp_treat a_bp_sys a_bp_dial a_hi_bp140_or_on_med a_bp_meas  hm_stay hm_headrel hh_sampleweight hh_headed  hh_region_num hh_region_lab  hh_size hh_urban hh_wealth_quintile a_hiv a_hiv_cat a_hiv_sampleweight {
 		gen `k'=.
     }
-	foreach k in c_stunted c_underweight ant_sampleweight{
+	foreach k in c_underweight c_underweight_sev c_stunted c_stunted_sev c_wasted c_wasted_sev c_stu_was c_stu_was_sev ant_sampleweight{
 		cap gen `k' = .
 	}
 	gen hh_country_code = hv000 
@@ -345,20 +388,22 @@ if miss_b16 != 1 {
 	gen hh_id = hv001_alt+hm_shstruct1_alt+hv002_alt
 	drop *_alt
 	
-capture confirm variable c_hc70 c_hc71 
+
+capture confirm variable c_hc70 c_hc71 c_hc72
 if _rc == 0 {
-rename (c_hc70 c_hc71) (hc70 hc71)
+rename (c_hc70 c_hc71 c_hc72) (hc70 hc71 hc72)
 }
 
-capture confirm variable hm_hc70 hm_hc71 
+capture confirm variable hm_hc70 hm_hc71 hm_hc72
 if _rc == 0 {
-rename (hm_hc70 hm_hc71 ) (hc70 hc71)
+rename (hm_hc70 hm_hc71 hm_hc72) (hc70 hc71 hc72)
 }
 
-capture confirm variable hc70 hc71
+capture confirm variable hc70 hc71 hc72
 if _rc != 0 {
 gen hc70=.
 gen hc71=.
+gen hc72=.
 }
 
 //rename c_ant_sampleweight ant_sampleweight
@@ -390,8 +435,6 @@ preserve
 	do "${DO}/Quality_control_result"
 	save "${OUT}/quality_control",replace 
 restore 
-
-
 	
 *** Specify sample size to HEFPI
 	
@@ -419,10 +462,9 @@ restore
     }
 	
 	***for vriables generated from 9_child_anthropometrics
-	foreach var of var c_underweight hc70 hc71 c_stunted ant_sampleweight{
+	foreach var of var c_underweight c_underweight_sev c_stunted c_stunted_sev c_wasted c_wasted_sev c_stu_was c_stu_was_sev ant_sampleweight hc70 hc71 hc72{
     replace `var' = . if !inrange(hm_age_mon,0,59)
     }
-
 	
 	***for hive indicators from 13_adult
 	foreach var of var a_diab_treat	a_inpatient_1y a_bp_treat a_bp_sys a_bp_dial a_hi_bp140_or_on_med a_bp_meas {
@@ -430,6 +472,11 @@ restore
     }
 	
 *** Label variables
+ 	* DW Nov 2021
+	rename hc71 c_wfa
+	rename hc70 c_hfa
+	rename hc72 c_wfh
+
     drop bidx surveyid
     do "${DO}/Label_var" 
 	
