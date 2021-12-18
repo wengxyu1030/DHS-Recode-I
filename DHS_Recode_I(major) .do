@@ -43,7 +43,7 @@ if `pc' != 0 global DO "${root}/STATA/DO/SC/DHS/DHS-Recode-I"
 * Define the country names (in globals) in by Recode
 do "${DO}/0_GLOBAL.do"
 
-global DHScountries_Recode_I "Sudan1989"
+global DHScountries_Recode_I "Bolivia1989 Burundi1987 Colombia1986 DominicanRepublic1986 Ecuador1987 Egypt1988 Ghana1988 Guatemala1987 Indonesia1987 Liberia1986 Mali1987 Mexico1987 Morocco1987 Sudan1989 Thailand1987 Togo1988 TrinidadandTobago1987 Uganda1988 Zimbabwe1988"
 /*
 This do files is use to process:
 Bolivia1989  Burundi1987  Colombia1986  DominicanRepublic1986 Ecuador1987 Egypt1988 Ghana1988 Guatemala1987  Indonesia1987 Liberia1986 Mali1987 Mexico1987  Morocco1987 Thailand1987  Togo1988  TrinidadandTobago1987 Uganda1988 Zimbabwe1988 ElSalvador1985 Sudan1989

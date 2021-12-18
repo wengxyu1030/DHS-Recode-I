@@ -42,7 +42,7 @@ if `pc' != 0 global DO "${root}/STATA/DO/SC/DHS/DHS-Recode-I"
 
 * Define the country names (in globals) in by Recode
 do "${DO}/0_GLOBAL.do"
-global DHScountries_Recode_I "Peru1986"
+global DHScountries_Recode_I "Brazil1986 Kenya1989 Senegal1986 SriLanka1987 Tunisia1988 Peru1986"
 
 /*
 The code is used to process Brazil1986  SriLanka1987 Tunisia1988 Kenya1989 Peru1986 Senegal1986
