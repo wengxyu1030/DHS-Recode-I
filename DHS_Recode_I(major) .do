@@ -249,6 +249,10 @@ if miss_b16 == 1 {
 rename (v001 v002 v003) (hv001 hv002 hvidx) //v003 in birth.dta: mother's line number
 }
 
+	* FEB 2022 DW
+	gen w_married=(v502==1)
+	replace w_married=. if inlist(v502,.,9)
+	
 keep hv001 hv002 hvidx bidx c_* mor_* w_* hm_* 
 save `birth'
 

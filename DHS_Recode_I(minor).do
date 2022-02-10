@@ -210,6 +210,10 @@ if miss_b16 == 1 {
 rename (v000 v001 v002 v003) (hv000 hv001 hv002 hvidx) //v003 in birth.dta: mother's line number
 }
 
+	* FEB 2022 DW
+	gen w_married=(v502==1)
+	replace w_married=. if inlist(v502,.,9)
+	
 /*DW NOV 2021*/
 *hh_religion: religion of household head (DW Team Nov 2021)
 	cap clonevar hh_religion = v130
