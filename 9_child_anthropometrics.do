@@ -7,7 +7,7 @@
 
  gen ant_sampleweight = . //hv005/1000000
  
- drop if hv103==0
+ cap drop if hv103==0
 
  gen c_stunted = . 
  gen c_underweight = . 

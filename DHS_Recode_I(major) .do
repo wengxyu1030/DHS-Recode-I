@@ -27,6 +27,7 @@ if `pc' == 1 global root "C:/Users/XWeng/OneDrive - WBG/MEASURE UHC DATA"
 
 * Define path for data sources
 global SOURCE "${root}/RAW DATA/Recode I"
+	if `pc' == 4 global SOURCE "/Volumes/Seagate Portable Drive 1/HEFPI DATA/RAW DATA/DHS/DHS I"
 
 * Define path for output data
 global OUT "${root}/STATA/DATA/SC/FINAL"
@@ -43,7 +44,7 @@ if `pc' != 0 global DO "${root}/STATA/DO/SC/DHS/DHS-Recode-I"
 * Define the country names (in globals) in by Recode
 do "${DO}/0_GLOBAL.do"
 
-global DHScountries_Recode_I "Bolivia1989 Burundi1987 Colombia1986 DominicanRepublic1986 Ecuador1987 Egypt1988 Ghana1988 Guatemala1987 Indonesia1987 Liberia1986 Mali1987 Mexico1987 Morocco1987 Sudan1989 Thailand1987 Togo1988 TrinidadandTobago1987 Uganda1988 Zimbabwe1988"
+global DHScountries_Recode_I " Burundi1987 Colombia1986 DominicanRepublic1986 Ecuador1987 Egypt1988 Ghana1988 Guatemala1987 Indonesia1987 Liberia1986 Mali1987 Mexico1987 Morocco1987 Sudan1989 Thailand1987 Togo1988 TrinidadandTobago1987 Uganda1988 Zimbabwe1988 Bolivia1989"
 /*
 This do files is use to process:
 Bolivia1989  Burundi1987  Colombia1986  DominicanRepublic1986 Ecuador1987 Egypt1988 Ghana1988 Guatemala1987  Indonesia1987 Liberia1986 Mali1987 Mexico1987  Morocco1987 Thailand1987  Togo1988  TrinidadandTobago1987 Uganda1988 Zimbabwe1988 ElSalvador1985 Sudan1989
