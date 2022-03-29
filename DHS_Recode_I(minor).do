@@ -52,7 +52,8 @@ We cannot generate hm.dta from hh.dta for these survey points
 either because the hh.dta doesn't offer household members' line number 
 or we cannot generate v001 v002 from hh.dta to match with birth.dta or ind.dta
 The final dataset only contains children and women sample
-*/
+*/	
+	
 foreach name in $DHScountries_Recode_I { //{
 
 tempfile birth ind men hm hiv hh wi zsc iso hmhh
@@ -449,7 +450,8 @@ restore
 	c_anc_eff3	c_anc_eff3_q	c_anc_ir	c_anc_ir_q	c_anc_ski	c_anc_ski_q ///
 	c_anc_tet	c_anc_tet_q	c_anc_ur	c_anc_ur_q	c_caesarean	c_earlybreast ///
 	c_facdel	c_hospdel	c_sba	c_sba_eff1	c_sba_eff1_q	c_sba_eff2 ///
-	c_sba_eff2_q	c_sba_q	c_skin2skin	c_pnc_any	c_pnc_eff	c_pnc_eff_q c_pnc_eff2	c_pnc_eff2_q {
+	c_sba_eff2_q	c_sba_q	c_skin2skin	c_pnc_any	c_pnc_eff	c_pnc_eff_q c_pnc_eff2 ///
+	c_pnc_eff2_q c_anc_public c_anc_hosp {
     replace `var' = . if !(inrange(hm_age_mon,0,23)& bidx ==1)
     }
 	

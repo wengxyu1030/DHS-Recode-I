@@ -132,8 +132,6 @@ order *,sequential
 
 	*c_anc_public : Received antenatal care in public facilities	 
 	gen c_anc_public = .
-pause on
-pause DHS III Anc Before
 
 	*w_sampleweight.
 	gen w_sampleweight = v005/10e6

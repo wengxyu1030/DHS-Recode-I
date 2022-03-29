@@ -45,6 +45,7 @@ if `pc' != 0 global DO "${root}/STATA/DO/SC/DHS/DHS-Recode-I"
 do "${DO}/0_GLOBAL.do"
 
 global DHScountries_Recode_I " Burundi1987 Colombia1986 DominicanRepublic1986 Ecuador1987 Egypt1988 Ghana1988 Guatemala1987 Indonesia1987 Liberia1986 Mali1987 Mexico1987 Morocco1987 Sudan1989 Thailand1987 Togo1988 TrinidadandTobago1987 Uganda1988 Zimbabwe1988 Bolivia1989"
+	
 /*
 This do files is use to process:
 Bolivia1989  Burundi1987  Colombia1986  DominicanRepublic1986 Ecuador1987 Egypt1988 Ghana1988 Guatemala1987  Indonesia1987 Liberia1986 Mali1987 Mexico1987  Morocco1987 Thailand1987  Togo1988  TrinidadandTobago1987 Uganda1988 Zimbabwe1988 ElSalvador1985 Sudan1989
@@ -493,7 +494,8 @@ restore
 	c_anc_eff3	c_anc_eff3_q	c_anc_ir	c_anc_ir_q	c_anc_ski	c_anc_ski_q ///
 	c_anc_tet	c_anc_tet_q	c_anc_ur	c_anc_ur_q	c_caesarean	c_earlybreast ///
 	c_facdel	c_hospdel	c_sba	c_sba_eff1	c_sba_eff1_q	c_sba_eff2 ///
-	c_sba_eff2_q	c_sba_q	c_skin2skin	c_pnc_any	c_pnc_eff	c_pnc_eff_q c_pnc_eff2	c_pnc_eff2_q {
+	c_sba_eff2_q	c_sba_q	c_skin2skin	c_pnc_any	c_pnc_eff	c_pnc_eff_q c_pnc_eff2 ///
+	c_pnc_eff2_q c_anc_hosp c_anc_public {
     replace `var' = . if !(inrange(hm_age_mon,0,23)& bidx ==1)
     }
 	
