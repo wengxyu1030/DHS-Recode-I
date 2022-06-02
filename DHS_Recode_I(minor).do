@@ -44,6 +44,7 @@ if `pc' != 0 global DO "${root}/STATA/DO/SC/DHS/DHS-Recode-I"
 * Define the country names (in globals) in by Recode
 do "${DO}/0_GLOBAL.do"
 global DHScountries_Recode_I "Brazil1986 Kenya1989 Senegal1986 SriLanka1987 Tunisia1988 Peru1986"
+global DHScountries_Recode_I "SriLanka1987"
 
 /*
 The code is used to process Brazil1986  SriLanka1987 Tunisia1988 Kenya1989 Peru1986 Senegal1986
@@ -420,10 +421,16 @@ gen hc72=.
 	tostring(year),replace
     gen country = regexs(0) if regexm("`name'","([a-zA-Z]+)")
 	
+	if inlist("`name'","SriLanka1987") {
+		replace country = "Sri Lanka"
+	}
+	
     merge m:1 country using `iso',force
     drop if _merge == 2
 	drop _merge
-
+	pause on 
+	pause check iso values
+	
 *** Quality Control: Validate with DHS official data
 gen surveyid = iso2c+year+"DHS"
 gen name = "`name'"
